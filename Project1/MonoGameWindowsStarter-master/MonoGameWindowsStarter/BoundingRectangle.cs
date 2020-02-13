@@ -14,51 +14,12 @@ namespace MonoGameWindowsStarter
         public float Width;
         public float Height;
 
-        /// <summary>
-        /// Gets or sets the right value
-        /// </summary>
-        public float Right
-        {
-            get => this.Right;
-            set
-            {
-                this.Right = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or set the left value
-        /// </summary>
-        public float Left
-        {
-            get => this.Left;
-            set
-            {
-                this.Left = value;
-            }
-        }
-
-        private float _Bottom; 
-        /// <summary>
-        /// Gets or sets the bottom value
-        /// </summary>
-        public float Bottom
-        {
-            get => _Bottom;
-            set
-            {
-                _Bottom = value;
-            }
-        }
-
-
         public BoundingRectangle(float x, float y, float width, float height)
         {
             this.X = x;
             this.Y = y;
             this.Width = width;
             this.Height = height;
-            this._Bottom = this.Height; 
         }
 
         /// <summary>

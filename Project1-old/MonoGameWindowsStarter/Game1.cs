@@ -46,8 +46,10 @@ namespace MonoGameWindowsStarter
         {
             // TODO: Add your initialization logic here
             // Set the game screen size
-            graphics.PreferredBackBufferWidth = 1042;
-            graphics.PreferredBackBufferHeight = 768;
+            //graphics.PreferredBackBufferWidth = 1042;
+            //graphics.PreferredBackBufferHeight = 768;
+            graphics.PreferredBackBufferWidth = 700;
+            graphics.PreferredBackBufferHeight = 400;
             graphics.ApplyChanges();
             ship.Initialize();
             //rocks[0].Initialize();

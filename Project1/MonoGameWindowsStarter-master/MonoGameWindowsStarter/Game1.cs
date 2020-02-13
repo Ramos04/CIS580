@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic; 
 
 namespace MonoGameWindowsStarter
 {
@@ -12,10 +14,30 @@ namespace MonoGameWindowsStarter
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        public Random Random = new Random();
+        private List<Rock> rocks;
+        Ship ship;
+        Rock rock;
+
+        private float timer; 
+
+        KeyboardState oldKeyboardState;
+        KeyboardState newKeyboardState;
+
+
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            // create the ship 
+            ship = new Ship(this);
+
+            // create list of rocks
+            rocks = new List<Rock>();
+
+ 
         }
 
         /// <summary>
@@ -26,7 +48,12 @@ namespace MonoGameWindowsStarter
         /// </summary>
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
+            // Set the game screen size
+            graphics.PreferredBackBufferWidth = 1042;
+            graphics.PreferredBackBufferHeight = 768;
+            graphics.ApplyChanges();
+
+            ship.Initialize();
 
             base.Initialize();
         }
@@ -41,6 +68,10 @@ namespace MonoGameWindowsStarter
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            ship.LoadContent(Content);
+
+            // Adds the first rock to the list
+            rocks.Add(new Rock(this, Content));
         }
 
         /// <summary>
@@ -59,10 +90,58 @@ namespace MonoGameWindowsStarter
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            // TODO: Add your update logic here
+            newKeyboardState = Keyboard.GetState();
+
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            if (newKeyboardState.IsKeyDown(Keys.Escape))
+                Exit();
+
+            // update the time
+            timer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            // update the shp 
+            ship.Update(gameTime, rocks);
+
+            // update rocks
+            foreach (Rock rock in rocks)
+            {
+                rock.Update(gameTime);
+                if (Collisions.CollidesWith(rock.Bounds, ship.Bounds))
+                {
+                    ship.HasCrashed = true; 
+                } 
+            }
+
+            if(ship.HasCrashed == true)
+            {
+                ship.Crash(); 
+                System.Threading.Thread.Sleep(5000);
+                this.Exit(); 
+            }
+
+            // check the timer and add a new rock if it is less than .4 seconds
+            if (timer > 0.20f)
+            {
+                timer = 0;
+                rocks.Add(new Rock(this, Content));
+            }
+
+            // remove rocks from the list that are past the screen
+            for (int i = 0; i < rocks.Count; i++)
+            {
+                var rock = rocks[i];
+                if (rock.IsRemoved)
+                {
+                    rocks.RemoveAt(i);
+                    i--;
+                    rock.Miss();
+                }
+            }
+
+            oldKeyboardState = newKeyboardState;
 
             base.Update(gameTime);
         }
@@ -75,7 +154,18 @@ namespace MonoGameWindowsStarter
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            // draw the ship 
+            ship.Draw(spriteBatch);
+            
+            // loop through the rocks
+            foreach(Rock rock in rocks)
+            {
+                rock.Draw(spriteBatch);
+            }
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
