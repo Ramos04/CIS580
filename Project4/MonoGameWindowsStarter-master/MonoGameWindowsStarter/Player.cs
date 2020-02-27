@@ -51,7 +51,7 @@ namespace MonoGameWindowsStarter
         SpriteFont font;                        // font drawing
 
         private float speed = (float)0.30;      // Speed multiplier 
-        private float vSpeed = (float)150;      // Speed multiplier 
+        private float vSpeed = (float)1.0;      // Speed multiplier 
 
 
         int frame;
@@ -98,7 +98,7 @@ namespace MonoGameWindowsStarter
                 case VerticalState.Jumping:
                     jumpTimer += gameTime.ElapsedGameTime;
                     // Simple jumping with platformer physics
-                    Bounds.Y -= (vSpeed / (float)jumpTimer.TotalMilliseconds);
+                    Bounds.Y -= (250 / (float)jumpTimer.TotalMilliseconds);
                     if (jumpTimer.TotalMilliseconds >= JUMP_TIME) verticalState = VerticalState.Falling;
                     break;
                 case VerticalState.Falling:
