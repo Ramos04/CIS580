@@ -11,14 +11,14 @@ using Microsoft.Xna.Framework.Content;
 
 namespace MonoGameWindowsStarter
 {
-    enum HorizontalState
+    public enum HorizontalState
     {
         Idle, 
         Left, 
         Right
     }
 
-    enum VerticalState
+    public enum VerticalState
     {
         Ground,
         Jumping,
@@ -50,19 +50,18 @@ namespace MonoGameWindowsStarter
 
         SpriteFont font;                        // font drawing
 
-        private float speed = (float)0.30;      // Speed multiplier 
-        private float vSpeed = (float)1.0;      // Speed multiplier 
+        public float speed = (float)0.30;      // Speed multiplier 
+        public float vSpeed = (float)1.0;      // Speed multiplier 
 
-
+        public Vector2 currSpeed;
         int frame;
 
-        Vector2 position;
+        public Vector2 position;
 
         TimeSpan jumpTimer;
 
-
-        VerticalState verticalState = VerticalState.Ground;
-        HorizontalState horizontalState = HorizontalState.Idle;
+        public VerticalState verticalState = VerticalState.Ground;
+        public HorizontalState horizontalState = HorizontalState.Idle;
 
         public Player(Game1 game)
         {
@@ -75,6 +74,8 @@ namespace MonoGameWindowsStarter
             Bounds.Height = 60;
             Bounds.X = game.GraphicsDevice.Viewport.Width / 2 - Bounds.Width / 2;
             Bounds.Y = game.GraphicsDevice.Viewport.Height - Bounds.Height;
+            position = new Vector2(Bounds.X, Bounds.Y);
+            currSpeed = new Vector2(0,0);
         }
 
         public void LoadContent(ContentManager content)
@@ -99,16 +100,20 @@ namespace MonoGameWindowsStarter
                     jumpTimer += gameTime.ElapsedGameTime;
                     // Simple jumping with platformer physics
                     Bounds.Y -= (250 / (float)jumpTimer.TotalMilliseconds);
+                    position.Y = Bounds.Y;
+                    currSpeed.Y = -(250 / (float)jumpTimer.TotalMilliseconds);
                     if (jumpTimer.TotalMilliseconds >= JUMP_TIME) verticalState = VerticalState.Falling;
                     break;
                 case VerticalState.Falling:
                     Bounds.Y += vSpeed;
+                    currSpeed.Y = vSpeed;
                     // TODO: This needs to be replaced with collision logic
                     if (Bounds.Y > game.GraphicsDevice.Viewport.Height || Bounds.Y == game.GraphicsDevice.Viewport.Height)
                     {
                         verticalState = VerticalState.Ground;
                         Bounds.Y = game.GraphicsDevice.Viewport.Height;
                     }
+                    position.Y = Bounds.Y;
                     break;
             }
 
@@ -118,12 +123,17 @@ namespace MonoGameWindowsStarter
                 // move left
                 horizontalState = HorizontalState.Left;
                 Bounds.X -= speed * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                currSpeed.X = -speed * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                position.X = Bounds.X;
             }
             else if (keyboardState.IsKeyDown(Keys.Right))
             {
                 // move right
                 horizontalState = HorizontalState.Right;
                 Bounds.X += speed * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                currSpeed.X = speed * (float)gameTime.ElapsedGameTime.TotalMilliseconds;
+                position.X = Bounds.X;
+
             }
             else
             {
